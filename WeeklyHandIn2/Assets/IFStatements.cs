@@ -23,7 +23,19 @@ public class IFStatements : MonoBehaviour
             colourtest();
 
         spherecolour = System.Convert.ToString(GetComponent<Renderer>().material.color);
-       
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            GetComponent<Renderer>().material.color = Color.red;
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            GetComponent<Renderer>().material.color = Color.green;
+        }
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            GetComponent<Renderer>().material.color = Color.blue;
+        }
     }
 
     void colourtest()
