@@ -8,6 +8,5 @@ public class playercapture : MonoBehaviour
     {
             Destroy(gameObject);
             Debug.Log("touching");
-    }
-
+    }    
 }

@@ -1,5 +1,5 @@
 sceneSetups:
-- path: Assets/Scenes/InTheManor.unity
+- path: Assets/Scenes/InTheClouds.unity
   isLoaded: 1
   isActive: 1
   isSubScene: 0
