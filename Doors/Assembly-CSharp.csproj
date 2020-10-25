@@ -71,6 +71,10 @@
     <Compile Include="Assets\SampleScenes\Scripts\PlaceTargetWithMouse.cs" />
     <Compile Include="Assets\Scripts\DoorPressurePlate.cs" />
     <Compile Include="Assets\Scripts\DoorButton.cs" />
+    <Compile Include="Assets\Scripts\KeyHolder.cs" />
+    <Compile Include="Assets\Scripts\KeyDoor.cs" />
+    <Compile Include="Assets\Scripts\Key.cs" />
+    <Compile Include="Assets\Scripts\UI_KeyHolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
