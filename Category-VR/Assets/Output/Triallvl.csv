@@ -1,0 +1,3 @@
+RowID, SubjectID, TrialID, Feature1Value, Feature2Value, Feature3Value, PlayerResponse, CorrectResponse, IsCorrect, TrialStartTime, ReactionTime, TimeSpentOnFeedback, TotalExperimentTime
+2, 1, 1, , , , CategoryA, CategoryC, 0, 5.999957, 6.09942, 6.661144, 18.76052
+3, 1, 2, , , , CategoryB, CategoryC, 0, 18.76052, 2.680473, 1.052916, 22.49391

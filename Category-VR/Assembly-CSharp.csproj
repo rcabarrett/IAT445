@@ -59,8 +59,12 @@
     <UnityVersion>2020.1.6f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\DataExtractor.cs" />
-    <Compile Include="Assets\Scripts\ControllerGrabObject.cs" />
+    <Compile Include="Assets\Custom_Scripts\DataExtractor.cs" />
+    <Compile Include="Assets\Custom_Scripts\ExperimentControl.cs" />
+    <Compile Include="Assets\Custom_Scripts\InputTester.cs" />
+    <Compile Include="Assets\Custom_Scripts\TrialPhaseTracker.cs" />
+    <Compile Include="Assets\Custom_Scripts\ChoiceButtons.cs" />
+    <Compile Include="Assets\Custom_Scripts\MyExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -656,6 +660,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="SteamVR_Actions.csproj">
+      <Project>{F4138733-4222-B26B-7993-9C7F11C7C277}</Project>
+      <Name>SteamVR_Actions</Name>
+    </ProjectReference>
     <ProjectReference Include="SteamVR_Input_Editor.csproj">
       <Project>{9D8F1A4E-5F79-67C5-F510-0D0AC6524880}</Project>
       <Name>SteamVR_Input_Editor</Name>
@@ -671,10 +679,6 @@
     <ProjectReference Include="SteamVR_Windows_EditorHelper.csproj">
       <Project>{C606D7D6-3001-8621-7282-530F31ABB53E}</Project>
       <Name>SteamVR_Windows_EditorHelper</Name>
-    </ProjectReference>
-    <ProjectReference Include="SteamVR_Actions.csproj">
-      <Project>{F4138733-4222-B26B-7993-9C7F11C7C277}</Project>
-      <Name>SteamVR_Actions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
