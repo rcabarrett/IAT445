@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.IO;
+using UnityEngine.SceneManagement;
+using System;
 
 public class DataExtractor : MonoBehaviour
 {
@@ -10,9 +12,15 @@ public class DataExtractor : MonoBehaviour
     public GameObject RightHand;
 
     // Filepaths of Output tables
-    private string gazelvl_filepath = "Assets/Output/Gazelvl.csv"; // NOTE: Eventually, the file name will based on the subject id variable
-    private string triallvl_filepath = "Assets/Output/Triallvl.csv";
-    private string explvl_filepath = "Assets/Output/Explvl.csv";
+    private string gazelvl_filename = "CatVR_Gazelvl.csv"; // NOTE: Eventually, the file name will based on the subject id variable
+    private string triallvl_filename = "CatVR_Triallvl.csv";
+    private string explvl_filename = "CatVR_Explvl.csv";
+    private string projectroot_root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Category-VR_Output");
+
+    private string gazelvl_filepath;
+    private string triallvl_filepath;
+    private GameObject SubjectIDStorage;
+    private string explvl_filepath;
 
     // Logical Indices
     public float is_newtrial;
@@ -21,19 +29,17 @@ public class DataExtractor : MonoBehaviour
     // ExpLvl Variables
     public float Explvl_IsEndofExp = 0;
     private float EndofExpTime;
-    public float explvl_CriterionPointMet;
-    public float explvl_CriterionPoint;
+    public float TotalAccuracy = 0;
+
 
     // TrialLvl Variables: RowID, TrialID, SubjectID
-    private int triallvl_rowid = 0;
-    private int explvl_rowid = 1;
-    private int SubjectID = 1;
-    private int trialID = 0;
+    public string SubjectID;
+    public int trialID = 0;
     public int TrialPhase;
     public string PlayerResponse;
     public string CorrectResponse;
     public int IsCorrect;
-    public int MaxNumberofTrials = 10;
+    public int MaxNumberofTrials;
     public float ReactionTime;
     public float TimeofChoiceMade;
     private float TimeOnFeedback;
@@ -42,20 +48,36 @@ public class DataExtractor : MonoBehaviour
     // GazeLvl Variables
     private string UnderReticule;
     public float IsRelevant;
-
+    private float CurrentTrial_TimeOnRelevant = 0;
+    private float CurrentTrial_TimeOnIrrelevant = 0;
+    private float CurrentTrial_TimeOnButtons = 0;
+    private float CurrentTrial_TimeOnOther = 0;
 
     // Begin the Experiment
-    void Awake ()
+    void Awake()
     {
-        if (!File.Exists("Assets/Output/Gazelvl.csv"))
+        // Get SubjectID 
+        SubjectID = GameObject.Find("SubjectIDStore").GetComponent<SubjectIDStore>().SubjectID;
+
+
+        // Establish Directories and Outputfiles if they are not already established
+        explvl_filepath = Path.Combine(projectroot_root, explvl_filename);
+        triallvl_filepath = Path.Combine(projectroot_root, triallvl_filename);
+        gazelvl_filepath = Path.Combine(projectroot_root, gazelvl_filename);
+
+        if (!Directory.Exists(projectroot_root))
+        {
+            Directory.CreateDirectory(projectroot_root);
+        }
+        if (!File.Exists(gazelvl_filepath))
         {
             Initialize_GazeLvl_Table();
         }
-        if (!File.Exists("Assets/Output/Triallvl.csv"))
+        if (!File.Exists(triallvl_filepath))
         {
             Initialize_TrialLvl_Table(); ;
         }
-        if (!File.Exists("Assets/Output/Explvl.csv"))
+        if (!File.Exists(explvl_filepath))
         {
             Initialize_ExpLvl_Table();
         }
@@ -67,16 +89,18 @@ public class DataExtractor : MonoBehaviour
     }
 
     // Update is called once per frame
-    private void Update ()
+    private void Update()
     {
         if (is_newtrial == 1) //Is called at the end of every trial
         {
             if (trialID > 0)
             {
                 Update_TrialLvl_Table();
+                if (IsCorrect == 1)
+                {
+                    TotalAccuracy++;
+                }
             }
-            // NOTE: This eventually needs to reference previous rowid to allow for multiple exps to exist in one table
-            triallvl_rowid++;
             trialID++;
             is_newtrial = 0;
             TrialStartTime = Time.time;
@@ -88,6 +112,7 @@ public class DataExtractor : MonoBehaviour
 
                 Update_ExpLvl_Table();
                 // NOTE: Initiate End of Experiment Room at this point ** ** ** ** ** ** ** ** ** ** ** **
+                GameObject.Find("LevelChanger").GetComponent<LevelChange>().LevelConditionsMet = 1;
             }
         }
 
@@ -97,15 +122,29 @@ public class DataExtractor : MonoBehaviour
             UnderReticule = hit.collider.gameObject.name;
 
             // Check for Relevance of object being viewed
-            if (hit.collider.gameObject.tag == "Relevant" || hit.collider.gameObject.tag == "ChoiceButton")
+            if (hit.collider.gameObject.tag == "Relevant")
             {
                 IsRelevant = 1;
+                CurrentTrial_TimeOnRelevant += Time.deltaTime;
             }
-            if (hit.collider.gameObject.tag == "Irrelevant")
+            else if (hit.collider.gameObject.tag == "Irrelevant")
             {
                 IsRelevant = 0;
+                CurrentTrial_TimeOnIrrelevant += Time.deltaTime;
             }
+            else if (hit.collider.gameObject.name == "A" || hit.collider.gameObject.name == "B" || hit.collider.gameObject.name == "C" || hit.collider.gameObject.name == "D" || hit.collider.gameObject.name == "Next")
+            {
+                IsRelevant = 2;
+                CurrentTrial_TimeOnButtons += Time.deltaTime;
+            }
+            else
+            {
+                IsRelevant = 3;
+                CurrentTrial_TimeOnOther += Time.deltaTime;
+            }
+
         }
+
 
         TrialPhase = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase;
 
@@ -121,15 +160,16 @@ public class DataExtractor : MonoBehaviour
 
         gazelvl_writer.WriteLine(SubjectID + ", " + trialID + ", " + TrialPhase + ", " + 
                             Time.time + ", " +
-                            Head.transform.position.x + ", " + Head.transform.position.y + ", " + Head.transform.position.z + ", " + "" + ", " +
-                            Head.transform.rotation.x + ", " + Head.transform.rotation.y + ", " + Head.transform.rotation.z + ", " + "" + ", " +
-                            LeftHand.transform.position.x + ", " + LeftHand.transform.position.y + ", " + LeftHand.transform.position.z + ", " + "" + ", " +
-                            RightHand.transform.position.x + ", " + RightHand.transform.position.y + ", " + RightHand.transform.position.z + ", " + "" + ", " +
+                            Head.transform.position.x + ", " + Head.transform.position.y + ", " + Head.transform.position.z + ", " +
+                            Head.transform.rotation.x + ", " + Head.transform.rotation.y + ", " + Head.transform.rotation.z + ", " +
+                            LeftHand.transform.position.x + ", " + LeftHand.transform.position.y + ", " + LeftHand.transform.position.z + ", " +
+                            RightHand.transform.position.x + ", " + RightHand.transform.position.y + ", " + RightHand.transform.position.z + ", " +
                             UnderReticule + ", " + IsRelevant); // Raycast info
 
         // Reset file in preparation for next frame
         gazelvl_writer.Close();
     }
+
     public void Update_TrialLvl_Table()
     {
         // Open TrialLvl file
@@ -138,25 +178,33 @@ public class DataExtractor : MonoBehaviour
         TotalExpTime = Time.time;
         ReactionTime = TimeofChoiceMade - TrialStartTime;
         TimeOnFeedback = TotalExpTime - TimeofChoiceMade;
-        triallvl_writer.WriteLine(triallvl_rowid + ", " + SubjectID + ", " + trialID + ", " +
-                                  "" +", " + "" + ", " + "" + ", " +
+        triallvl_writer.WriteLine(SubjectID + ", " + trialID + ", " +
+                                  "1" + ", " + "1" + ", " + "0" + ", " +
+                                  CurrentTrial_TimeOnRelevant + ", " + CurrentTrial_TimeOnIrrelevant + ", " + CurrentTrial_TimeOnButtons + ", " + CurrentTrial_TimeOnOther + ", " +
                                   PlayerResponse + ", " + CorrectResponse + ", " + IsCorrect + ", " +
                                   TrialStartTime + ", " + ReactionTime + ", " + TimeOnFeedback + ", " + TotalExpTime);
         triallvl_writer.Close();
+        // Reset GazeTimers for Next Trial
+        CurrentTrial_TimeOnRelevant = 0;
+        CurrentTrial_TimeOnIrrelevant = 0;
+        CurrentTrial_TimeOnButtons = 0;
+        CurrentTrial_TimeOnOther = 0;
+
     }
+
     public void Update_ExpLvl_Table()
     {
         StreamWriter explvl_writer = new StreamWriter(explvl_filepath, true);
         if (Explvl_IsEndofExp == 0)
         {
-            explvl_writer.Write(explvl_rowid + ", " + SubjectID + ", " +
-                           "testing" + ", " + "" + ", " + "" + ", " + "" + ", " + "" + ", " + "" + ", " + "" + ", ");
+            explvl_writer.Write(SubjectID + ", " +
+                           "demo" + ", " + "1" + ", " + "1" + ", " + "0" + ", ");
             // Note: We wait until the end of the experiment to insert the CriterionPointMet, CriterionPoint, and TotalExperiment
         }
 
         if (Explvl_IsEndofExp == 1)
         {
-            explvl_writer.WriteLine(explvl_CriterionPointMet + ", " + explvl_CriterionPoint + ", " + EndofExpTime);
+            explvl_writer.WriteLine(TotalAccuracy + ", " + MaxNumberofTrials + ", " + EndofExpTime);
         }
         // Close File
         explvl_writer.Close();
@@ -171,31 +219,34 @@ public class DataExtractor : MonoBehaviour
         gazelvl_writer.WriteLine("SubjectID, TrialID, TrialPhase, " +
                                 "Time, " +
                                 "HMD_x, HMD_y, HMD_z, HMD_Displacement, " +
-                                "HMD_Rotation_x, HMD_Rotation_y, HMD_Rotation_z, HMD_RotationalDisplacement, " +
-                                "LeftHand_x, LeftHand_y, LeftHand_z, LeftHand_Displacement, " +
-                                "RightHand_x, RightHand_y, RightHand_z, RightHand_Displacement, " +
+                                "HMD_Rotation_x, HMD_Rotation_y, HMD_Rotation_z," +
+                                "LeftHand_x, LeftHand_y, LeftHand_z," +
+                                "RightHand_x, RightHand_y, RightHand_z," +
                                 "LookingAt, IsRelevant");
         // Allow other files to be opened on this path
         gazelvl_writer.Close();
     }
+
     private void Initialize_ExpLvl_Table()
     {
-        // Initialize Triallvl output file
+        // Initialize Expllvl output file
         StreamWriter explvl_writer = new StreamWriter(explvl_filepath, true);
         // Set Headers
-        explvl_writer.WriteLine("RowID, SubjectID, " +
-                                "Condition, Location1Feature, Location2Feature, Location3Feature, Location1Relevance, Location2Relevance, Location3Relevance, " +
-                                "CriterionPointMet, CriterionPoint, TotalExperimentTime");
+        explvl_writer.WriteLine("SubjectID, " +
+                                "Condition, BlueRelevance, GreenRelevance, RedRelevance, " +
+                                "TotalCorrect, TrialCount, TotalExperimentTime");
         // Close File
         explvl_writer.Close();
     }
+
     private void Initialize_TrialLvl_Table()
     {
         // Initialize Triallvl output file
         StreamWriter triallvl_writer = new StreamWriter(triallvl_filepath, true);
         // Set Headers
-        triallvl_writer.WriteLine("RowID, SubjectID, TrialID, " +
-                                  "Feature1Value, Feature2Value, Feature3Value, " +
+        triallvl_writer.WriteLine("SubjectID, TrialID, " +
+                                  "Feature1Relevance, Feature2Relevance, Feature3Relevance, " +
+                                  "TimeFixatedOnRelevantFeature, TimeFixatedOnIrrelevantFeature, TimeFixatedOnButtons, TimeFixatedOnOther, "+
                                   "PlayerResponse, CorrectResponse, IsCorrect, " + 
                                   "TrialStartTime, ReactionTime, TimeSpentOnFeedback, TotalExperimentTime");
         // Close File

@@ -13,6 +13,7 @@ TagManager:
   - CategoryB
   - CategoryC
   - CategoryD
+  - TutorialCube
   layers:
   - Default
   - TransparentFX

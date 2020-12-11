@@ -23,41 +23,44 @@ namespace Valve.VR.InteractionSystem.Sample
         public int poolAmount;
         int currentIndex = 0;
         private GameObject previousStimulus = null;
+        
+
+        private static System.Random rng = new System.Random();
 
         // Used for Global Tracking of Experimental Status
         public GameObject CurrentStimulus = null;
         private MeshRenderer[] ButtonMeshes;
         private object OrderofStimuli;
+        public int IsTutorial;
+        private string CurrentScript;
 
         private void Start()
         {
             pool = new List<GameObject>();
+            //Shuffle<GameObject>(pool);
+
             for (int i = 0; i < poolAmount; i++)
             {
                 int randomIndex = UnityEngine.Random.Range(0, randomObjects.Length);
-                GameObject obj = (GameObject)Instantiate(randomObjects[randomIndexi]);
+                GameObject obj = (GameObject)Instantiate(randomObjects[randomIndex]);
                 obj.SetActive(false);
                 pool.Add(obj);
             }
 
-            
-            ////var rnd = new System.Random();
-            ////var result = pool.OrderBy(item => rnd.Next());
-
-            ////foreach (var item in result)
-            ////{
-            ////    Console.WriteLine(item.name);
-            ////}
-
             Vector3 SpawnPointCoordinates = SpawnPointMarker.transform.position;
         }
-
 
         private IEnumerator StartNextTrial()
         {
             GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase = 2;
-            GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().is_newtrial = 1;
-
+            if (IsTutorial == 1)
+            {
+                GameObject.Find("ResearchAssistant").GetComponent<Tutorial>().is_newtrial = 1;
+            }
+            else
+            {
+                GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().is_newtrial = 1;
+            }
             // reset colour of buttons and platform
             ButtonMeshes = GameObject.Find("Choices").GetComponentsInChildren<MeshRenderer>();
 
@@ -81,7 +84,7 @@ namespace Valve.VR.InteractionSystem.Sample
             CurrentStimulus = pool[currentIndex];
 
             pool[currentIndex].transform.position = SpawnPointMarker.transform.position;
-            pool[currentIndex].transform.rotation = Quaternion.Euler(0, 0, 0);
+            pool[currentIndex].transform.rotation = Quaternion.Euler(60, -90, 45);
             pool[currentIndex].transform.localScale = new Vector3(30, 30, 30);
             pool[currentIndex].SetActive(true);
 
@@ -91,7 +94,7 @@ namespace Valve.VR.InteractionSystem.Sample
                 pool.Clear();
                 for (int a = 0; a < poolAmount; a++)
                 {
-                    int randomIndex = Random.Range(0, randomObjects.Length);
+                    int randomIndex = UnityEngine.Random.Range(0, randomObjects.Length);
                     GameObject obj = (GameObject)Instantiate(randomObjects[randomIndex]);
                     obj.SetActive(false);
                     pool.Add(obj);
@@ -114,7 +117,9 @@ namespace Valve.VR.InteractionSystem.Sample
                 if (GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase == 4 || GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase == 0) 
                 {
                     StartCoroutine(StartNextTrial());
-                    
+                    AudioSource.PlayClipAtPoint(GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().NextTrialSound, transform.position);
+
+
                 }
                 
             }

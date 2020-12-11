@@ -15,6 +15,9 @@ public class TrialPhaseTracker : MonoBehaviour
     public Material CorrectChoicePlatform;
     public Material IncorrectChoicePlatform;
     public Material NoChoicePlatform;
+    public AudioClip CorrectSound;
+    public AudioClip IncorrectSound;
+    public AudioClip NextTrialSound;
 
     // Start is called before the first frame update
     void Start()

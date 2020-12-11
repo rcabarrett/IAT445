@@ -59,12 +59,18 @@
     <UnityVersion>2020.1.6f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assets\Custom_Scripts\SayGoodbye.cs" />
     <Compile Include="Assets\Custom_Scripts\DataExtractor.cs" />
     <Compile Include="Assets\Custom_Scripts\ExperimentControl.cs" />
     <Compile Include="Assets\Custom_Scripts\InputTester.cs" />
-    <Compile Include="Assets\Custom_Scripts\TrialPhaseTracker.cs" />
-    <Compile Include="Assets\Custom_Scripts\ChoiceButtons.cs" />
     <Compile Include="Assets\Custom_Scripts\MyExtensions.cs" />
+    <Compile Include="Assets\Custom_Scripts\TrialPhaseTracker.cs" />
+    <Compile Include="Assets\Custom_Scripts\LevelChange.cs" />
+    <Compile Include="Assets\Custom_Scripts\GetParticipantNumber.cs" />
+    <Compile Include="Assets\Custom_Scripts\SubjectIDStore.cs" />
+    <Compile Include="Assets\Custom_Scripts\Tutorial.cs" />
+    <Compile Include="Assets\Custom_Scripts\ChoiceButtons.cs" />
+    <Compile Include="Assets\Custom_Scripts\GoToNextRoom.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

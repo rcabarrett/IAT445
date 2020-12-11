@@ -16,6 +16,7 @@ namespace Valve.VR.InteractionSystem.Sample
         public GameObject[] OtherChoiceButtons;
         public GameObject ThisGameObject;
         private string ThisChoiceButton;
+        private int TutorialTrial;
 
         private void Start()
         {
@@ -34,36 +35,68 @@ namespace Valve.VR.InteractionSystem.Sample
                     // Check Current Category
                     CurrentStimulusCategory = GameObject.Find("Next").GetComponent<InputTester>().CurrentStimulus.tag;
                     // Update Output Table
-                    GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().CorrectResponse = CurrentStimulusCategory;
-                    GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().PlayerResponse = ThisGameObject.tag;
-                    GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().TimeofChoiceMade = Time.time;
-
-
-                    if (ThisChoiceButton == CurrentStimulusCategory) // Correct Choice - Proceed to Feedback
+                    
+                    if (CurrentStimulusCategory == "TutorialCube")
                     {
-                        // Update Output Tables
-                        GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase = 4;
-                        GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().IsCorrect = 1;
-
-                        // Turn Green
-                        GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoice;
-                        GameObject.Find("Glow").GetComponent<MeshRenderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoicePlatform;
-                    }
-                    else // Incorrect Choice - Proceed to Feedback
-                    {
-                        // Update Output Tables
-                        GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase = 4;
-                        GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().IsCorrect = 0;
-
-                        // Turn Red
-                        GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectChoice;
-                        GameObject.Find("Glow").GetComponent<MeshRenderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectChoicePlatform;
-                        // Turn Correct Button Green
-                        foreach (GameObject otherbutton in OtherChoiceButtons)
+                        if (GameObject.Find("ResearchAssistant").GetComponent<Tutorial>().trialID == 2)
                         {
-                            if (otherbutton.tag == CurrentStimulusCategory)
+                            // Turn Red
+                            GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectChoice;
+                            GameObject.Find("Glow").GetComponent<MeshRenderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectChoicePlatform;
+                            AudioSource.PlayClipAtPoint(GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectSound, transform.position);
+                            AudioSource.PlayClipAtPoint(GameObject.Find("ResearchAssistant").GetComponent<Tutorial>().Tutorial5, transform.position);
+
+                            foreach (GameObject otherbutton in OtherChoiceButtons)
                             {
                                 otherbutton.GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoice;
+                            }
+                        }
+                        else
+                        {
+                            // Turn Green
+                            GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoice;
+                            GameObject.Find("Glow").GetComponent<MeshRenderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoicePlatform;
+                            AudioSource.PlayClipAtPoint(GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectSound, transform.position);
+                            AudioSource.PlayClipAtPoint(GameObject.Find("ResearchAssistant").GetComponent<Tutorial>().Tutorial3, transform.position);
+
+                        }
+
+                        // Update Output Tables
+                        GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase = 4;
+                    }
+                    else
+                    {
+                        GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().CorrectResponse = CurrentStimulusCategory;
+                        GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().PlayerResponse = ThisGameObject.tag;
+                        GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().TimeofChoiceMade = Time.time;
+                        if (ThisChoiceButton == CurrentStimulusCategory) // Correct Choice - Proceed to Feedback
+                        {
+                            // Update Output Tables
+                            GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase = 4;
+                            GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().IsCorrect = 1;
+
+                            // Turn Green
+                            GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoice;
+                            GameObject.Find("Glow").GetComponent<MeshRenderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoicePlatform;
+                            AudioSource.PlayClipAtPoint(GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectSound, transform.position);
+                        }
+                        else // Incorrect Choice - Proceed to Feedback
+                        {
+                            // Update Output Tables
+                            GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CurrentTrialPhase = 4;
+                            GameObject.Find("ResearchAssistant").GetComponent<DataExtractor>().IsCorrect = 0;
+
+                            // Turn Red
+                            GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectChoice;
+                            GameObject.Find("Glow").GetComponent<MeshRenderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectChoicePlatform;
+                            AudioSource.PlayClipAtPoint(GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().IncorrectSound, transform.position);
+                            // Turn Correct Button Green
+                            foreach (GameObject otherbutton in OtherChoiceButtons)
+                            {
+                                if (otherbutton.tag == CurrentStimulusCategory)
+                                {
+                                    otherbutton.GetComponentInChildren<Renderer>().material = GameObject.Find("ResearchAssistant").GetComponent<TrialPhaseTracker>().CorrectChoice;
+                                }
                             }
                         }
                     }
