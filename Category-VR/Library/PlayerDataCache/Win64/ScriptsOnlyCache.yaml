@@ -40,6 +40,8 @@ ScriptsOnlyBuild:
     - Valve.VR.SteamVR_Settings
     - Valve.VR.SteamVR_Skeleton_Pose
     - Valve.VR.SteamVR_Skeleton_Poser
+    SteamVR_Editor.dll:
+    - Valve.VR.SteamVR_UnitySettingsWindow
     SteamVR_Input_Editor.dll:
     - Valve.VR.SteamVR_Input_EditorWindow
     Unity.Rider.Editor.dll:
@@ -49,8 +51,6 @@ ScriptsOnlyBuild:
     Unity.XR.Management.dll:
     - UnityEngine.XR.Management.XRGeneralSettings
     - UnityEngine.XR.Management.XRManagerSettings
-    Unity.XR.OpenVR.Editor.dll:
-    - Unity.XR.OpenVR.Editor.OpenVRSettingsEditor
     Unity.XR.OpenVR.dll:
     - Unity.XR.OpenVR.OpenVRLoader
     - Unity.XR.OpenVR.OpenVRSettings
@@ -1872,4 +1872,4 @@ ScriptsOnlyBuild:
   - Assets/Scenes/TutorialRoom.unity
   - Assets/Scenes/TestingRoom.unity
   - Assets/Scenes/EndExp.unity
-  playerPath: C:/Users/Robin/Desktop/CategoryVR/Category-VR.exe
+  playerPath: C:/Users/Robin/Desktop/Category-VR.exe
